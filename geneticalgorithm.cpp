@@ -6,7 +6,6 @@
 GeneticAlgorithm::GeneticAlgorithm() {
     maxScore.push_back(0);
     avgScore.push_back(0);
-
 }
 
 //public
@@ -17,6 +16,16 @@ float GeneticAlgorithm::getAvgScore(const int index) {
 
 float GeneticAlgorithm::getAxleAngle(const int index) {
     return chromes[currentCar][START_WHEELS_GEN + index*3 + 1]*M_PI*2;
+}
+
+unsigned int GeneticAlgorithm::getCarCallListNuber() {
+    return callLists[currentCar];
+}
+
+unsigned int GeneticAlgorithm::getCarParentCallListNumber(const int parent) {
+    if (parent)
+        return parentsCallLists[currentCar][1];
+    return parentsCallLists[currentCar][0];
 }
 
 int GeneticAlgorithm::getCarNum() {
@@ -89,6 +98,9 @@ void GeneticAlgorithm::init() {
             colors[i][j][BLUE] = blue;
         }
         springsCount[i] = 0;
+        callLists[i] = 0;
+        parentsCallLists[i][0] = 0;
+        parentsCallLists[i][1] = 0;
     }
     createCache();
     currentCar = -1;
@@ -120,7 +132,11 @@ void GeneticAlgorithm::nextGenetation() {
     maxScore.push_back(scores[max1]);
     avgScore.push_back(total/POP_SIZE);
     copyChrome(max1, 0);
+    parentsCallLists[0][0] = callLists[max1];
+    parentsCallLists[0][0] = 0;
     copyChrome(max2, 1);
+    parentsCallLists[1][0] = callLists[max2];
+    parentsCallLists[1][0] = 0;
     int winners[POP_SIZE/2];
     bool queue[POP_SIZE];
     for (int i = 0; i < POP_SIZE; i++) {
@@ -146,6 +162,10 @@ void GeneticAlgorithm::nextGenetation() {
     createCache();
     generationNum++;
     currentCar = 0;
+}
+
+void GeneticAlgorithm::setCarCallList(const unsigned int callListNumber) {
+    callLists[currentCar] = callListNumber;
 }
 
 void GeneticAlgorithm::setScoreAndTime(float score, float time) {
@@ -223,6 +243,10 @@ void GeneticAlgorithm::crossover(const int parentA, const int parentB,
             setColors(parentA, offspringA, parentB, offspringB, i);
         }
     }
+    parentsCallLists[offspringA][0] = callLists[parentA];
+    parentsCallLists[offspringA][1] = callLists[parentB];
+    parentsCallLists[offspringB][0] = callLists[parentB];
+    parentsCallLists[offspringB][1] = callLists[parentA];
 }
 
 QColor GeneticAlgorithm::getColor(const int index) {

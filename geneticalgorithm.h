@@ -11,6 +11,8 @@ public:
 
     float getAvgScore(const int index);
     float getAxleAngle(const int index);
+    unsigned int getCarCallListNuber();
+    unsigned int getCarParentCallListNumber(const int parent);
     int getCarNum();
     float getCartAngle(const int index);
     QColor getColorAxle(const int index);
@@ -26,6 +28,7 @@ public:
     void init();
     bool nextCar();
     void nextGenetation();
+    void setCarCallList(const unsigned int callListNumber);
     void setScoreAndTime(float score, float time);
 
 private:
@@ -56,6 +59,7 @@ private:
                    const int offspringB, const int index);
 
     QVector <float> avgScore;
+    unsigned int callLists[POP_SIZE];
     float chromes[POP_SIZE][CROMES_SIZE];
     float oldChromes[POP_SIZE][CROMES_SIZE];
     float cacheMagnitudes[POP_SIZE][8];
@@ -63,6 +67,7 @@ private:
     unsigned short int colors[POP_SIZE][16][3];
     QVector<float> maxScore;
     unsigned short int oldColors[POP_SIZE][16][3];
+    unsigned int parentsCallLists[POP_SIZE][2];
     float scores[POP_SIZE];
     int springsCount[POP_SIZE];
     float times[POP_SIZE];
