@@ -20,6 +20,7 @@ public:
     int getGenerationNum();
     float getMagnitude(const int index);
     float getMaxScore(const int index);
+    unsigned int getOldCallListNubmer();
     float getScore(const int index);
     int getSpringCount(const int index);
     int getTime(const int index);
@@ -57,6 +58,8 @@ private:
     void mutation();
     void setColors(const int parentA, const int offspringA, const int  parentB,
                    const int offspringB, const int index);
+    void setParentCallLists(const int index, const int parentACL,
+                            const int parentBCL);
 
     QVector <float> avgScore;
     unsigned int callLists[POP_SIZE];
@@ -64,9 +67,11 @@ private:
     float oldChromes[POP_SIZE][CROMES_SIZE];
     float cacheMagnitudes[POP_SIZE][8];
     float cacheAngles[POP_SIZE][8];
+    int callListIndex;
     unsigned short int colors[POP_SIZE][16][3];
     QVector<float> maxScore;
     unsigned short int oldColors[POP_SIZE][16][3];
+    unsigned int oldCallLists[POP_SIZE*2];
     unsigned int parentsCallLists[POP_SIZE][2];
     float scores[POP_SIZE];
     int springsCount[POP_SIZE];

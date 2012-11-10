@@ -9,6 +9,7 @@ World::World() {
     algorithm->init();
     algorithm->nextCar();
     uptime = 0;
+    newGen = false;
     init();
 }
 
@@ -57,13 +58,31 @@ float World::getUptime() {
     return uptime;
 }
 
+bool World::reinited() {
+    if (justNowInit) {
+        justNowInit = false;
+        return true;
+    }
+    return false;
+}
+
+bool World::newGeneration() {
+    if (newGen) {
+        newGen = false;
+        return true;
+    }
+    return false;
+}
+
 void World::step() {
     car->update();
     updateSparks();
     if (car->isStoped()) {
         algorithm->setScoreAndTime(car->getMaxPossition(), car->getTime());
-        if (!algorithm->nextCar())
+        if (!algorithm->nextCar()) {
             algorithm->nextGenetation();
+            newGen = true;
+        }
         destroy();
         init();
     }
@@ -102,6 +121,7 @@ void World::init() {
     track = new Track(b2world);
     car = new Car(algorithm, b2world);
     qsrand(car->getBody()->GetMass());
+    justNowInit = true;
 }
 
 void World::updateSparks() {

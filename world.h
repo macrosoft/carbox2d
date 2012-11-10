@@ -24,6 +24,8 @@ public:
     b2Body *getSpark(const int index);
     int getSparkCount();
     float getUptime();
+    bool reinited();
+    bool newGeneration();
     void step();
     void updateSparks();
 
@@ -47,6 +49,8 @@ private:
     b2World *b2world;
     Car *car;
     ContactListener *contactListener;
+    bool justNowInit;
+    bool newGen;
     QVector<b2Fixture *> sparks;
     QVector<sparkStuct> sparkList;
     Track *track;

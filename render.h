@@ -10,7 +10,8 @@ class Render : public QGLWidget {
 public:
     explicit Render(World *pWorld, QWidget *parent);
     ~Render();
-
+    void createCarCallList();
+    void deleteCallList(const unsigned int index);
     void setSpeed(int newSpeed);
 
 private:
@@ -34,6 +35,7 @@ private:
                     const QColor &color);
     void drawGraph();
     void drawGrid();
+    void drawParents();
     void drawPolygon(const b2Vec2* vertices, int32 vertexCount,
                      const QColor &color);
     void drawSparks();

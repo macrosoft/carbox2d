@@ -19,6 +19,22 @@ Render::Render(World *pWorld, QWidget *parent) :
 Render::~Render() {
 }
 
+void Render::createCarCallList() {
+    GeneticAlgorithm *algorithm = world->getAlgorithm();
+    unsigned int oldCallListNubmer = algorithm->getCarCallListNuber();
+    if (oldCallListNubmer)
+        glDeleteLists(oldCallListNubmer, 1);
+    unsigned int listNubmer = glGenLists(1);
+    algorithm->setCarCallList(listNubmer);
+    glNewList(listNubmer, GL_COMPILE);
+    drawCar();
+    glEndList();
+}
+
+void Render::deleteCallList(const unsigned int index) {
+    glDeleteLists(index, 1);
+}
+
 void Render::setSpeed(int newSpeed) {
     speed = newSpeed;
 }
@@ -148,6 +164,53 @@ void Render::drawGraph() {
     glDrawArrays(GL_LINE_STRIP, 0, count);
     glDisableClientState(GL_VERTEX_ARRAY);
     glLineWidth(1);
+}
+
+void Render::drawParents() {
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+    float aspectRatio = (float)width()/height();
+    float left, right, bottom, top;
+    if (aspectRatio < 1) {
+        left = -20;
+        right = 20;
+        bottom = -20/aspectRatio;
+        top = 20/aspectRatio;
+    }
+    else {
+        left = -20*aspectRatio;
+        right = 20*aspectRatio;
+        bottom = -20;
+        top = 20;
+    }
+    glOrtho(left, right, bottom, top, 1.0, -1.0);
+    qglColor(QColor(255, 255, 200, 96));
+    glBegin(GL_QUADS);
+        glVertex2f(right - 20.5, bottom + 10.5);
+        glVertex2f(right - 20.5, bottom + 0.5);
+        glVertex2f(right - 0.5, bottom + 0.5);
+        glVertex2f(right - 0.5, bottom + 10.5);
+    glEnd();
+    qglColor(Qt::gray);
+    glBegin(GL_LINE_LOOP);
+        glVertex2f(right - 20.5, bottom + 10.5);
+        glVertex2f(right - 20.5, bottom + 0.5);
+        glVertex2f(right - 0.5, bottom + 0.5);
+        glVertex2f(right - 0.5, bottom + 10.5);
+    glEnd();
+
+    glTranslated(right - 15.5, bottom + 1.5f, 0.0f);
+    glCallList(world->getAlgorithm()->getCarParentCallListNumber(0));
+    glTranslated(10.0f, 0.0f, 0.0f);
+    glCallList(world->getAlgorithm()->getCarParentCallListNumber(1));
+
+    glPopMatrix(); //GL_MODELVIEW
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
 }
 
 void Render::drawPolygon(const b2Vec2* vertices, int32 vertexCount,
@@ -293,14 +356,6 @@ void Render::move() {
 }
 
 void Render::paintGL() {
-    GeneticAlgorithm *algorithm = world->getAlgorithm();
-    if (!algorithm->getCarCallListNuber()) {
-        algorithm->setCarCallList(glGenLists(1));
-        glNewList(algorithm->getCarCallListNuber(), GL_COMPILE);
-        drawCar();
-        glEndList();
-        //glDeleteLists(listId, 1);
-    }
     glClear(GL_COLOR_BUFFER_BIT);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -312,54 +367,7 @@ void Render::paintGL() {
     drawSparks();
     drawBody(world->getTrack()->getBody());
     drawText();
-
-    //---
-    glMatrixMode(GL_PROJECTION);
-    glPushMatrix();
-    glLoadIdentity();
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glLoadIdentity();
-    float aspectRatio = (float)width()/height();
-    float left, right, bottom, top;
-    if (aspectRatio < 1) {
-        left = -20;
-        right = 20;
-        bottom = -20/aspectRatio;
-        top = 20/aspectRatio;
-    }
-    else {
-        left = -20*aspectRatio;
-        right = 20*aspectRatio;
-        bottom = -20;
-        top = 20;
-    }
-    glOrtho(left, right, bottom, top, 1.0, -1.0);
-    qglColor(QColor(255, 255, 200, 192));
-    glBegin(GL_QUADS);
-        glVertex2f(right - 20.5, bottom + 10.5);
-        glVertex2f(right - 20.5, bottom + 0.5);
-        glVertex2f(right - 0.5, bottom + 0.5);
-        glVertex2f(right - 0.5, bottom + 10.5);
-    glEnd();
-    qglColor(Qt::gray);
-    glBegin(GL_LINE_LOOP);
-        glVertex2f(right - 20.5, bottom + 10.5);
-        glVertex2f(right - 20.5, bottom + 0.5);
-        glVertex2f(right - 0.5, bottom + 0.5);
-        glVertex2f(right - 0.5, bottom + 10.5);
-    glEnd();
-
-    glTranslated(right - 15.5, bottom + 1.5f, 0.0f);
-    glCallList(algorithm->getCarParentCallListNumber(0));
-    glTranslated(10.0f, 0.0f, 0.0f);
-    glCallList(algorithm->getCarParentCallListNumber(1));
-
-    glPopMatrix(); //GL_MODELVIEW
-    glMatrixMode(GL_PROJECTION);
-    glPopMatrix();
-
-    //---
+    drawParents();
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();

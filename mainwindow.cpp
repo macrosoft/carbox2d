@@ -77,7 +77,13 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
 
 void MainWindow::timerEvent(QTimerEvent *e __attribute__ ((unused))) {
     for (int i = 0; i < speed; i++) {
-        world->step();          
+        world->step();
+        if (world->newGeneration())
+            while (unsigned int clNuber =
+                   world->getAlgorithm()->getOldCallListNubmer())
+                render->deleteCallList(clNuber);
+        if (world->reinited())
+            render->createCarCallList();
     }
     render->updateGL();
 }

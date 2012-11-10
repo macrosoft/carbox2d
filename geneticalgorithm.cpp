@@ -19,6 +19,11 @@ float GeneticAlgorithm::getAxleAngle(const int index) {
 }
 
 unsigned int GeneticAlgorithm::getCarCallListNuber() {
+    for (int i = 0; i < POP_SIZE; i++) {
+        for (int j = 0; j < 2; j++)
+            if (parentsCallLists[i][j] == callLists[currentCar])
+                return 0;
+    }
     return callLists[currentCar];
 }
 
@@ -54,6 +59,12 @@ float GeneticAlgorithm::getMagnitude(const int index) {
 
 float GeneticAlgorithm::getMaxScore(const int index) {
     return maxScore[index];
+}
+
+unsigned int GeneticAlgorithm::getOldCallListNubmer() {
+    if (callListIndex >= POP_SIZE*2)
+        return 0;
+    return oldCallLists[callListIndex++];
 }
 
 float GeneticAlgorithm::getScore(const int index) {
@@ -101,6 +112,8 @@ void GeneticAlgorithm::init() {
         callLists[i] = 0;
         parentsCallLists[i][0] = 0;
         parentsCallLists[i][1] = 0;
+        oldCallLists[i*2] = 0;
+        oldCallLists[i*2 + 1] = 0;
     }
     createCache();
     currentCar = -1;
@@ -132,11 +145,9 @@ void GeneticAlgorithm::nextGenetation() {
     maxScore.push_back(scores[max1]);
     avgScore.push_back(total/POP_SIZE);
     copyChrome(max1, 0);
-    parentsCallLists[0][0] = callLists[max1];
-    parentsCallLists[0][0] = 0;
+    setParentCallLists(0,  callLists[max1], 0);
     copyChrome(max2, 1);
-    parentsCallLists[1][0] = callLists[max2];
-    parentsCallLists[1][0] = 0;
+    setParentCallLists(1,  callLists[max2], 0);
     int winners[POP_SIZE/2];
     bool queue[POP_SIZE];
     for (int i = 0; i < POP_SIZE; i++) {
@@ -145,7 +156,7 @@ void GeneticAlgorithm::nextGenetation() {
     }
     for (int i = 0; i < POP_SIZE/2; i++) {
         int a = getRandomChrome(queue);
-        int b = getRandomChrome(queue);      
+        int b = getRandomChrome(queue);
         winners[i] = compareCar(scores[a], times[a], scores[b], times[b])? a: b;
         springsCount[winners[i]]++;
     }
@@ -154,7 +165,7 @@ void GeneticAlgorithm::nextGenetation() {
         queue[i] = true;
     for (int i = 2; i < POP_SIZE/2; i++) {
         int parentA = winners[i];
-        int parentB = getRandomChrome(queue);
+        int parentB = getRandomChrome(queue, parentA);
         crossover(parentA, parentB, i*2, i*2 + 1);
         springsCount[parentB]++;
     }
@@ -162,6 +173,7 @@ void GeneticAlgorithm::nextGenetation() {
     createCache();
     generationNum++;
     currentCar = 0;
+    callListIndex = 0;
 }
 
 void GeneticAlgorithm::setCarCallList(const unsigned int callListNumber) {
@@ -243,10 +255,8 @@ void GeneticAlgorithm::crossover(const int parentA, const int parentB,
             setColors(parentA, offspringA, parentB, offspringB, i);
         }
     }
-    parentsCallLists[offspringA][0] = callLists[parentA];
-    parentsCallLists[offspringA][1] = callLists[parentB];
-    parentsCallLists[offspringB][0] = callLists[parentB];
-    parentsCallLists[offspringB][1] = callLists[parentA];
+    setParentCallLists(offspringA, callLists[parentA], callLists[parentB]);
+    setParentCallLists(offspringB, callLists[parentB], callLists[parentA]);
 }
 
 QColor GeneticAlgorithm::getColor(const int index) {
@@ -296,4 +306,13 @@ void GeneticAlgorithm::setColors(const int parentA, const int offspringA,
         colors[offspringA][i][channel] = oldColors[parentA][i][channel];
         colors[offspringB][i][channel] = oldColors[parentB][i][channel];
     }
+}
+
+void GeneticAlgorithm::setParentCallLists(const int index, const int parentACL,
+                                          const int parentBCL) {
+    oldCallLists[index*2] = parentsCallLists[index][0];
+    oldCallLists[index*2 + 1] = parentsCallLists[index][1]?
+                parentsCallLists[index][1]: parentsCallLists[index][0];
+    parentsCallLists[index][0] = parentACL;
+    parentsCallLists[index][1] = parentBCL;
 }
