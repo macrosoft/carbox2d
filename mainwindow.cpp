@@ -97,7 +97,7 @@ void MainWindow::setSpeed(int newSpeed) {
 
 void MainWindow::showAbout() {
     QMessageBox::about(this, tr("About carbox2d"),
-                       tr("<h2>Carbox2d 0.1</h2>"
+                       tr("<h2>Carbox2d 0.2</h2>"
                           "<p>Evolution simulator like "
                           "<a href='http://boxcar2d.com/'>http://boxcar2d.com/</a></p>"
                           "<p>Copyright &copy; 2012 Zagidulin Artyom</p>"
