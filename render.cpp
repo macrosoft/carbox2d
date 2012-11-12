@@ -452,7 +452,7 @@ void Render::updateGraph() {
     }
     int width = this->width() - 400;
     int height = 200;
-    float dx = width/count;
+    float dx = float(width)/count;
     float max = algorithm->getMaxScore(count);
     if (max < 1)
         max = 1;
