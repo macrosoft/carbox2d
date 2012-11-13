@@ -5,7 +5,8 @@
 #include <QVector>
 #include "Box2D.h"
 
-class GeneticAlgorithm {
+class GeneticAlgorithm: public QObject {
+    Q_OBJECT
 public:
     GeneticAlgorithm();
 
@@ -20,17 +21,19 @@ public:
     int getGenerationNum();
     float getMagnitude(const int index);
     float getMaxScore(const int index);
-    unsigned int getOldCallListNubmer();
     float getScore(const int index);
     int getSpringCount(const int index);
     int getTime(const int index);
     int getWheelOn(const int index);
     float getWheelRadius(const int index);
     void init();
-    bool nextCar();
+    void nextCar();
     void nextGenetation();
     void setCarCallList(const unsigned int callListNumber);
     void setScoreAndTime(float score, float time);
+
+signals:
+    void freeCallListNumber(unsigned int);
 
 private:
     static const int CROMES_SIZE = 40;
@@ -71,7 +74,6 @@ private:
     unsigned short int colors[POP_SIZE][16][3];
     QVector<float> maxScore;
     unsigned short int oldColors[POP_SIZE][16][3];
-    unsigned int oldCallLists[POP_SIZE*2];
     unsigned int parentsCallLists[POP_SIZE][2];
     float scores[POP_SIZE];
     int springsCount[POP_SIZE];

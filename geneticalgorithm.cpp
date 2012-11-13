@@ -61,12 +61,6 @@ float GeneticAlgorithm::getMaxScore(const int index) {
     return maxScore[index];
 }
 
-unsigned int GeneticAlgorithm::getOldCallListNubmer() {
-    if (callListIndex >= POP_SIZE*2)
-        return 0;
-    return oldCallLists[callListIndex++];
-}
-
 float GeneticAlgorithm::getScore(const int index) {
     if (generationNum && !currentCar)
         return scores[index];
@@ -112,22 +106,25 @@ void GeneticAlgorithm::init() {
         callLists[i] = 0;
         parentsCallLists[i][0] = 0;
         parentsCallLists[i][1] = 0;
-        oldCallLists[i*2] = 0;
-        oldCallLists[i*2 + 1] = 0;
     }
     createCache();
     currentCar = -1;
     generationNum = 0;
 }
 
-bool GeneticAlgorithm::nextCar() {
+void GeneticAlgorithm::nextCar() {
     currentCar++;
     if (currentCar >= POP_SIZE)
-        return false;
-    return true;
+        nextGenetation();
 }
 
 void GeneticAlgorithm::nextGenetation() {
+    for (int i = 0; i < POP_SIZE; i++) {
+        for (int j = 0; j < 2; j++) {
+            if (parentsCallLists[i][j])
+            emit freeCallListNumber(parentsCallLists[i][j]);
+        }
+    }
     copyChromes();
     int max1 = 0;
     int max2 = 1;
@@ -310,9 +307,6 @@ void GeneticAlgorithm::setColors(const int parentA, const int offspringA,
 
 void GeneticAlgorithm::setParentCallLists(const int index, const int parentACL,
                                           const int parentBCL) {
-    oldCallLists[index*2] = parentsCallLists[index][0];
-    oldCallLists[index*2 + 1] = parentsCallLists[index][1]?
-                parentsCallLists[index][1]: parentsCallLists[index][0];
     parentsCallLists[index][0] = parentACL;
     parentsCallLists[index][1] = parentBCL;
 }

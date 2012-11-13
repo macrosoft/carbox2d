@@ -10,7 +10,8 @@
 
 class ContactListener;
 
-class World {
+class World: public QObject {
+    Q_OBJECT
 public:
     World();
     ~World();
@@ -24,10 +25,14 @@ public:
     b2Body *getSpark(const int index);
     int getSparkCount();
     float getUptime();
-    bool reinited();
-    bool newGeneration();
     void step();
-    void updateSparks();
+
+signals:
+    void creteNewCar();
+    void freeCallListNumber(unsigned int);
+
+public slots:
+    void carStoped();
 
 private:
     struct sparkStuct {
@@ -44,13 +49,12 @@ private:
     void destroy();
     void destroySpark(const int index);
     void init();
+    void updateSparks();
 
     GeneticAlgorithm *algorithm;
     b2World *b2world;
     Car *car;
     ContactListener *contactListener;
-    bool justNowInit;
-    bool newGen;
     QVector<b2Fixture *> sparks;
     QVector<sparkStuct> sparkList;
     Track *track;

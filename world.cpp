@@ -6,10 +6,11 @@
 World::World() {
     qsrand(QDateTime::currentDateTime().toTime_t());
     algorithm = new GeneticAlgorithm();
+    connect(algorithm, SIGNAL(freeCallListNumber(uint)),
+            SIGNAL(freeCallListNumber(uint)));
     algorithm->init();
     algorithm->nextCar();
     uptime = 0;
-    newGen = false;
     init();
 }
 
@@ -58,34 +59,9 @@ float World::getUptime() {
     return uptime;
 }
 
-bool World::reinited() {
-    if (justNowInit) {
-        justNowInit = false;
-        return true;
-    }
-    return false;
-}
-
-bool World::newGeneration() {
-    if (newGen) {
-        newGen = false;
-        return true;
-    }
-    return false;
-}
-
 void World::step() {
     car->update();
     updateSparks();
-    if (car->isStoped()) {
-        algorithm->setScoreAndTime(car->getMaxPossition(), car->getTime());
-        if (!algorithm->nextCar()) {
-            algorithm->nextGenetation();
-            newGen = true;
-        }
-        destroy();
-        init();
-    }
     b2world->Step(TIME_STEP, ITERATIONS, ITERATIONS);
     uptime += TIME_STEP;
 }
@@ -120,9 +96,21 @@ void World::init() {
     b2world->SetContactListener(contactListener);
     track = new Track(b2world);
     car = new Car(algorithm, b2world);
+    connect(car, SIGNAL(stoped()), SLOT(carStoped()));
+    emit creteNewCar();
     qsrand(car->getBody()->GetMass());
-    justNowInit = true;
 }
+
+//slots
+
+void World::carStoped() {
+    algorithm->setScoreAndTime(car->getMaxPossition(), car->getTime());
+    algorithm->nextCar();
+    destroy();
+    init();
+}
+
+//private
 
 void World::updateSparks() {
     while (sparkList.size()) {

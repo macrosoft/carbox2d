@@ -10,9 +10,11 @@ class Render : public QGLWidget {
 public:
     explicit Render(World *pWorld, QWidget *parent);
     ~Render();
+    void setSpeed(int newSpeed);
+
+public slots:
     void createCarCallList();
     void deleteCallList(const unsigned int index);
-    void setSpeed(int newSpeed);
 
 private:
     float boundTop;

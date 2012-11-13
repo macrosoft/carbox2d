@@ -19,6 +19,12 @@ Render::Render(World *pWorld, QWidget *parent) :
 Render::~Render() {
 }
 
+void Render::setSpeed(int newSpeed) {
+    speed = newSpeed;
+}
+
+//slots
+
 void Render::createCarCallList() {
     GeneticAlgorithm *algorithm = world->getAlgorithm();
     unsigned int oldCallListNubmer = algorithm->getCarCallListNuber();
@@ -33,10 +39,6 @@ void Render::createCarCallList() {
 
 void Render::deleteCallList(const unsigned int index) {
     glDeleteLists(index, 1);
-}
-
-void Render::setSpeed(int newSpeed) {
-    speed = newSpeed;
 }
 
 //private

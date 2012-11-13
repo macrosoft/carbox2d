@@ -5,7 +5,8 @@
 #include "Box2D.h"
 #include "geneticalgorithm.h"
 
-class Car {
+class Car: public QObject {
+    Q_OBJECT
 public:
     Car(GeneticAlgorithm *pAlghorithm, b2World *world);
     ~Car();
@@ -24,10 +25,12 @@ public:
     float getSpeed();
     float getTime();
     float getTorque();
-    bool isStoped();
     void setBreakFixture(const int index, const bool val);
     void update();
     void updateTorque();
+
+signals:
+    void stoped();
 
 private:
     static const float MASS_MULT = 1.5;
@@ -58,7 +61,6 @@ private:
     b2RevoluteJoint *motor[8];
     float prevPossition;
     int slow;
-    bool stoped;
     b2PrismaticJoint *spring[8];
     float torque;
     b2Fixture *wheel[8];

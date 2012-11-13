@@ -126,10 +126,6 @@ float Car::getTorque() {
     return torque;
 }
 
-bool Car::isStoped() {
-    return stoped;
-}
-
 void Car::setBreakFixture(const int index, const bool val) {
     breakCartFixture[index] = val;
 }
@@ -176,7 +172,7 @@ void Car::update() {
     float maxSlow = possition > 10? 300: 180;
     if (slow >= maxSlow || possition >= TRACK_LENGTH ||
             itteration > MAX_ITTERATION || possition < -10 || brokeNum >= 7)
-        stoped = true;
+        emit stoped();
 }
 
 void Car::updateTorque() {
@@ -290,7 +286,6 @@ void Car::createWheels(b2BodyDef &bodyDef) {
 }
 
 void Car::init(b2BodyDef &bodyDef) {
-    stoped = false;
     bodyDef.position.Set(0, 4);
     bodyDef.angle = 0;
     bodyDef.type = b2_dynamicBody;

@@ -6,12 +6,17 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent) {
     world = new World();
     render = new Render(world, this);
+    connect(world, SIGNAL(creteNewCar()), render, SLOT(createCarCallList()));
+    connect(world, SIGNAL(freeCallListNumber(uint)), render,
+            SLOT(deleteCallList(uint)));
     this->setCentralWidget(render);
     this->resize(800, 600);
     setWindowTitle(tr("Carbox2d"));
     createMenu();
     speed = SPEED_NORMAL;
     startTimer(1000/30);
+    render->updateGL();
+    render->createCarCallList();
 }
 
 MainWindow::~MainWindow() {
@@ -76,15 +81,8 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
 }
 
 void MainWindow::timerEvent(QTimerEvent *e __attribute__ ((unused))) {
-    for (int i = 0; i < speed; i++) {
+    for (int i = 0; i < speed; i++)
         world->step();
-        if (world->newGeneration())
-            while (unsigned int clNuber =
-                   world->getAlgorithm()->getOldCallListNubmer())
-                render->deleteCallList(clNuber);
-        if (world->reinited())
-            render->createCarCallList();
-    }
     render->updateGL();
 }
 
