@@ -15,6 +15,7 @@ World::World() {
 }
 
 World::~World() {
+    algorithm->deleteLater();
     destroy();
 }
 
@@ -73,7 +74,8 @@ void World::destroy() {
         destroySpark(0);
     }
     sparks.clear();
-    delete car;
+    car->deletePhisicsBody();
+    car->deleteLater();
     delete track;
     delete contactListener;
     delete b2world;

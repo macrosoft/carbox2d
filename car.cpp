@@ -14,7 +14,35 @@ Car::Car(GeneticAlgorithm *pAlghorithm, b2World *world):
     update();
 }
 
-Car::~Car() {
+//public
+
+void Car::breakFixture(const int index) {
+    breakCartFixture[index] = false;
+    int i = index%8;
+    if (index < 8) {
+        QColor *color = (QColor *)cartFixture[i]->GetUserData();
+        carBody->DestroyFixture(cartFixture[i]);
+        cartFixture[i] = NULL;
+        b2BodyDef bodyDef;
+        bodyDef.type = b2_dynamicBody;
+        bodyDef.position = carBody->GetPosition();
+        bodyDef.angle = carBody->GetAngle();
+        b2Body *piece = b2world->CreateBody(&bodyDef);
+        b2Fixture *f = piece->CreateFixture(&cartShapes[i], 2);
+        f->SetUserData(color);
+        pieces.push_back(f);
+    } else {
+        QColor *color = (QColor *)axleFixture[i]->GetUserData();
+        carBody->DestroyFixture(axleFixture[i]);
+        axleFixture[i] = NULL;
+        b2Fixture *f = axle[i]->CreateFixture(&axleShapes[i], 2);
+        f->SetUserData(color);
+        wheelOn[i] = BROKEN_WHEELS;
+        wheelsCount--;
+    }
+}
+
+void Car::deletePhisicsBody() {
     QColor *color;
     for (int i = 0; i < 8; i++) {
         if (wheelOn[i] != NO_WHEELS || wheelOn[i] == BROKEN_WHEELS) {
@@ -45,33 +73,6 @@ Car::~Car() {
         b2world->DestroyBody(p->GetBody());
     }
 }
-
-void Car::breakFixture(const int index) {
-    breakCartFixture[index] = false;
-    int i = index%8;
-    if (index < 8) {
-        QColor *color = (QColor *)cartFixture[i]->GetUserData();
-        carBody->DestroyFixture(cartFixture[i]);
-        cartFixture[i] = NULL;
-        b2BodyDef bodyDef;
-        bodyDef.type = b2_dynamicBody;
-        bodyDef.position = carBody->GetPosition();
-        bodyDef.angle = carBody->GetAngle();
-        b2Body *piece = b2world->CreateBody(&bodyDef);
-        b2Fixture *f = piece->CreateFixture(&cartShapes[i], 2);
-        f->SetUserData(color);
-        pieces.push_back(f);
-    } else {
-        QColor *color = (QColor *)axleFixture[i]->GetUserData();
-        carBody->DestroyFixture(axleFixture[i]);
-        axleFixture[i] = NULL;
-        b2Fixture *f = axle[i]->CreateFixture(&axleShapes[i], 2);
-        f->SetUserData(color);
-        wheelOn[i] = BROKEN_WHEELS;
-        wheelsCount--;
-    }
-}
-
 
 b2Body *Car::getAxleBody(const int index) {
     return wheelOn[index] == NO_WHEELS? NULL: axle[index];

@@ -9,9 +9,9 @@ class Car: public QObject {
     Q_OBJECT
 public:
     Car(GeneticAlgorithm *pAlghorithm, b2World *world);
-    ~Car();
 
     void breakFixture(const int index);
+    void deletePhisicsBody();
     b2Body *getAxleBody(const int index);
     b2Fixture *getAxleFixture(const int index);
     b2Body *getBody();

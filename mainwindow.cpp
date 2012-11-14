@@ -20,7 +20,8 @@ MainWindow::MainWindow(QWidget *parent) :
 }
 
 MainWindow::~MainWindow() {
-    world->~World();
+    world->deleteLater();
+    render->deleteLater();
 }
 
 //private
