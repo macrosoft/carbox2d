@@ -61,16 +61,16 @@ float GeneticAlgorithm::getMaxScore(const int index) {
     return maxScore[index];
 }
 
+int GeneticAlgorithm::getOffspringsCount(const int index) {
+    return offspringsCount[index];
+}
+
 float GeneticAlgorithm::getScore(const int index) {
     if (generationNum && !currentCar)
         return scores[index];
     if (currentCar <= index)
         return -1;
     return scores[index];
-}
-
-int GeneticAlgorithm::getSpringCount(const int index) {
-    return springsCount[index];
 }
 
 int GeneticAlgorithm::getTime(const int index) {
@@ -102,7 +102,7 @@ void GeneticAlgorithm::init() {
             colors[i][j][GREEN] = green;
             colors[i][j][BLUE] = blue;
         }
-        springsCount[i] = 0;
+        offspringsCount[i] = 0;
         callLists[i] = 0;
         parentsCallLists[i][0] = 0;
         parentsCallLists[i][1] = 0;
@@ -110,6 +110,7 @@ void GeneticAlgorithm::init() {
     createCache();
     currentCar = -1;
     generationNum = 0;
+    mutationRate = 0;
 }
 
 void GeneticAlgorithm::nextCar() {
@@ -139,6 +140,11 @@ void GeneticAlgorithm::nextGenetation() {
         } else if (compareCar(scores[i], times[i], scores[max2], times[max2]))
             max2 = i;
     }
+    bool newRecord = qAbs(scores[max1] - maxScore[maxScore.size() - 1]) >= 1;
+    if (mutationRate < MAX_MUTATION_RATE && !newRecord)
+        mutationRate += 0.5;
+    else if (newRecord)
+        mutationRate = 0;
     maxScore.push_back(scores[max1]);
     avgScore.push_back(total/POP_SIZE);
     copyChrome(max1, 0);
@@ -149,13 +155,13 @@ void GeneticAlgorithm::nextGenetation() {
     bool queue[POP_SIZE];
     for (int i = 0; i < POP_SIZE; i++) {
         queue[i] = true;
-        springsCount[i] = 0;
+        offspringsCount[i] = 0;
     }
     for (int i = 0; i < POP_SIZE/2; i++) {
         int a = getRandomChrome(queue);
         int b = getRandomChrome(queue);
         winners[i] = compareCar(scores[a], times[a], scores[b], times[b])? a: b;
-        springsCount[winners[i]]++;
+        offspringsCount[winners[i]]++;
     }
     crossover(winners[0], winners[1], 2, 3);
     for (int i = 0; i < POP_SIZE; i++)
@@ -164,7 +170,7 @@ void GeneticAlgorithm::nextGenetation() {
         int parentA = winners[i];
         int parentB = getRandomChrome(queue, parentA);
         crossover(parentA, parentB, i*2, i*2 + 1);
-        springsCount[parentB]++;
+        offspringsCount[parentB]++;
     }
     mutation();
     createCache();
@@ -184,8 +190,8 @@ void GeneticAlgorithm::setScoreAndTime(float score, float time) {
 
 //private
 
-bool GeneticAlgorithm::compareCar(const float scoreA, const float timeA, const int scoreB,
-                                  const float timeB) {
+bool GeneticAlgorithm::compareCar(const float scoreA, const float timeA,
+                                  const int scoreB, const float timeB) {
     if (scoreA > scoreB)
         return true;
     if (scoreB > scoreA)
@@ -274,7 +280,7 @@ int GeneticAlgorithm::getRandomChrome(bool queue[], const int excluding) {
 void GeneticAlgorithm::mutation() {
     for (int i = 2; i < POP_SIZE; i++) {
         for (int j = 0; j < CROMES_SIZE; j++) {
-            if (qrand()%100 < MUTATION_RATE) {
+            if (qrand()%1000 < mutationRate*10.0) {
                 chromes[i][j] =  float(qrand())/float(RAND_MAX);
                 int colorIndex = j < 16? j/2: (j - 16)/3;
                 for (int channel = 0; channel < 3; channel++) {

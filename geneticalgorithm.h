@@ -21,8 +21,8 @@ public:
     int getGenerationNum();
     float getMagnitude(const int index);
     float getMaxScore(const int index);
+    int getOffspringsCount(const int index);
     float getScore(const int index);
-    int getSpringCount(const int index);
     int getTime(const int index);
     int getWheelOn(const int index);
     float getWheelRadius(const int index);
@@ -45,12 +45,13 @@ private:
     static const int POP_SIZE = 32;
     static const float WHEEL_PROB0 = 0.5; //(0:1]
     static const int START_WHEELS_GEN = 16;
-    static const int MUTATION_RATE = 5;
+    static const int MAX_MUTATION_RATE = 5.0;
     static const int RED = 0;
     static const int GREEN = 1;
     static const int BLUE = 2;
 
-    bool compareCar(const float scoreA, const float timeA, const int scoreB, const float timeB);
+    bool compareCar(const float scoreA, const float timeA, const int scoreB,
+                    const float timeB);
     void copyChrome(const int parent, const int offspring);
     void copyChromes();
     void createCache();
@@ -73,10 +74,11 @@ private:
     int callListIndex;
     unsigned short int colors[POP_SIZE][16][3];
     QVector<float> maxScore;
+    float mutationRate;
     unsigned short int oldColors[POP_SIZE][16][3];
     unsigned int parentsCallLists[POP_SIZE][2];
     float scores[POP_SIZE];
-    int springsCount[POP_SIZE];
+    int offspringsCount[POP_SIZE];
     float times[POP_SIZE];
     int currentCar;
     int generationNum;

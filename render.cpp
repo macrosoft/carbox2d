@@ -270,7 +270,7 @@ void Render::drawTable() {
     for (int i = 0; i < 32; i++) {
         qglColor(Qt::black);
         if (!algorithm->getCarNum() && algorithm->getGenerationNum()) {
-            switch (algorithm->getSpringCount(i)) {
+            switch (algorithm->getOffspringsCount(i)) {
             case 0: qglColor(Qt::red);
                 break;
             case 1: qglColor(Qt::black);
