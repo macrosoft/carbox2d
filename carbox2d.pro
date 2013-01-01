@@ -1,5 +1,5 @@
 TEMPLATE      = app
-QT  += opengl
+QT  += widgets opengl
 HEADERS       = \
     world.h \
     track.h \
