@@ -58,7 +58,7 @@ void Render::drawBody(b2Body *body) {
         break;
         case b2Shape::e_polygon: {
             b2PolygonShape* poly = (b2PolygonShape*)f->GetShape();
-            int32 vertexCount = poly->m_vertexCount;
+            int32 vertexCount = poly->GetVertexCount();
             b2Assert(vertexCount <= b2_maxPolygonVertices);
             b2Vec2 vertices[b2_maxPolygonVertices];
             for (int32 i = 0; i < vertexCount; ++i) {
